@@ -17,4 +17,21 @@ event http_request(c: connection, method: string, original_URI: string, unescape
 	else {
 	methTable[method] = 1;
 	}
+		print c;
+	print "\n";
+	print method；
+	print "\n";
+	print original_URI;
+	print "\n";
+	print unescaped_URI;
+	print "\n";
+	print version;
+	print "\n\n";
+}
+
+event http_header(c: connection, is_orig: bool, name: string, value: string){
+	print name;
+	print "\n";
+	print value;
+	print "\n";
 }
