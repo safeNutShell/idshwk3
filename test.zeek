@@ -1,37 +1,32 @@
-global methTable :table[count] of int = table();
+global agent : table[addr,string] of int = table();
+global rem : table[addr] of int = table();
 
-event zeek_init()
+event http_all_headers(c: connection, is_orig: bool, hlist: mime_header_list)
 	{
-	print "Hello, World!";
+		if([c$id$orig_h, to_lower( c$http$user_agent)] !in agent)
+		{
+			agent[c$id$orig_h, to_lower(c$http$user_agent)]=1;
+		}
 	}
-
+	
 event zeek_done()
 	{
-	print methTable;
+		for([j,i] in agent)
+		{
+			if(j !in rem)
+			{
+				rem[j]=1;
+			}
+			else 
+			{
+				rem[j]+=1;
+			}
+		}
+		for(j in rem)
+		{
+			if( rem[j] >= 3 )
+			{
+				print fmt("%s is a proxy",j);
+			}
+		}
 	}
-
-event http_request(c: connection, method: string, original_URI: string, unescaped_URI: string, version: string){
-	if(method in methTable){
-		methTable[method]+=1;
-	}
-	else {
-	methTable[method] = 1;
-	}
-		print c;
-	print "\n";
-	print method；
-	print "\n";
-	print original_URI;
-	print "\n";
-	print unescaped_URI;
-	print "\n";
-	print version;
-	print "\n\n";
-}
-
-event http_header(c: connection, is_orig: bool, name: string, value: string){
-	print name;
-	print "\n";
-	print value;
-	print "\n";
-}
